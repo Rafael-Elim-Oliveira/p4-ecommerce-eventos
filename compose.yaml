@@ -1,0 +1,25 @@
+services:
+  banco:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ecommerce
+      POSTGRES_DB: ecommerce
+    volumes:
+      - dados:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -h localhost -U ecommerce
+      interval: 2s
+      retries: 15
+
+  api:
+    build: .
+    env_file: .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      banco:
+        condition: service_healthy
+
+volumes:
+  dados:
