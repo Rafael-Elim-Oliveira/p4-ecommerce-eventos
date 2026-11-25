@@ -17,6 +17,8 @@ import { PaymentMethodRegistry } from '../payments/PaymentMethodRegistry';
 import { NotificationService } from '../services/NotificationService';
 import { OrderService } from '../services/OrderService';
 import { OrderController } from '../controllers/OrderController';
+import { IOrderQueue } from '../providers/IOrderQueue';
+import { RedisOrderQueue } from '../providers/RedisOrderQueue';
 
 const isTest = process.env.APP_ENV === 'test';
 
@@ -38,6 +40,7 @@ container.bind<IPaymentMethod>(TYPES.PaymentMethod).to(DebitCardPayment);
 container.bind<IPaymentMethod>(TYPES.PaymentMethod).to(PixPayment);
 container.bind(PaymentMethodRegistry).toSelf().inSingletonScope();
 
+container.bind<IOrderQueue>(TYPES.OrderQueue).to(RedisOrderQueue).inSingletonScope();
 container.bind(NotificationService).toSelf();
 container.bind(OrderService).toSelf();
 container.bind(OrderController).toSelf();
