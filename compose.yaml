@@ -12,6 +12,24 @@ services:
       interval: 2s
       retries: 15
 
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", 'ping']
+      interval: 2s
+      retries: 15
+
+  worker:
+    build: .
+    command: npm run worker
+    env_file:
+    - .env
+    depends_on:
+      banco:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   api:
     build: .
     env_file: .env
@@ -19,6 +37,8 @@ services:
       - "3000:3000"
     depends_on:
       banco:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 volumes:

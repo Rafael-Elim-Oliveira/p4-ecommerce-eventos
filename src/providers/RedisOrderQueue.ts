@@ -1,8 +1,9 @@
-import { Injectable } from 'inversify';
+import { injectable } from 'inversify';
 import { createClient } from 'redis';
 import { IOrderQueue } from './IOrderQueue';
 import { Order } from '../domain/Order';
 
+@injectable()
 export class RedisOrderQueue implements IOrderQueue {
     private client;
     private readonly queueName = 'orders_email_queue';
@@ -16,6 +17,9 @@ export class RedisOrderQueue implements IOrderQueue {
     }
 
     async publish(order: Order): Promise<void> {
-        await this.client.lpush(this.queueName, JSON.stringify(order));
+        if (!this.client.isOpen) {
+            await this.client.connect();
+        }
+        await this.client.lPush(this.queueName, JSON.stringify(order));
     }
 }
